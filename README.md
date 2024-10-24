@@ -1,1 +1,1 @@
-# product-manger
+# product-manager
