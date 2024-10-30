@@ -15,8 +15,12 @@ class Logger
         if (self::$logger === null) {
             self::$logger = new MonologLogger($_ENV['APP_NAME']);
 
-            $logFile = dirname(__DIR__, 2) . "./logs/app.log";
-
+            $logFile = dirname(__DIR__, 2) . "/logs/app.log";
+            // Ensure the log directory exists
+            if (!is_dir(dirname($logFile))) {
+                mkdir(dirname($logFile), 0777, true);
+            }
+            
             if ($_ENV['APP_ENV'] === 'production') {
                 self::$logger->pushHandler(new RotatingFileHandler($logFile, 30, MonologLogger::WARNING));
             } else {

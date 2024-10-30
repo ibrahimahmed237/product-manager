@@ -2,10 +2,7 @@
 
 namespace App\Exceptions;
 
-use App\Exceptions\ProductException;
-use InvalidArgumentException;
-use PDOException;
-use RuntimeException;
+use App\Utils\Logger;
 use Throwable;
 
 class Handler
@@ -95,9 +92,7 @@ class Handler
      */
     private static function logException(Throwable $exception): void
     {
-        if (!is_dir('logs')) {
-            mkdir('logs', 0777, true);
-        }
+        $logger = Logger::getLogger();
 
         $logMessage = sprintf(
             "[%s] %s: %s in %s:%d\nStack trace:\n%s\n",
@@ -108,8 +103,7 @@ class Handler
             $exception->getLine(),
             $exception->getTraceAsString()
         );
-
-        error_log($logMessage, 3, 'logs/error.log');
+        $logger->error($logMessage);
     }
 
     /**

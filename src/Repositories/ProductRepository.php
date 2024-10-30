@@ -25,7 +25,7 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $stm = $this->db->query(
             "
-            SELECT id, slug, name, price, type, 
+            SELECT id, sku, name, price, type, 
             CASE type WHEN 'DVD' THEN 'size' 
             WHEN 'BOOK' THEN 'weight'
             WHEN 'Furniture' THEN CONCAT(height, 'x', width, 'x', length)
