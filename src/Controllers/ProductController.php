@@ -5,7 +5,8 @@ namespace App\Controllers;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Services\ProductFactory;
 use App\Services\ValidationService;
-use RuntimeException;
+use App\Exceptions\ProductException;
+use App\Exceptions\Handler;
 
 class ProductController
 {
@@ -29,7 +30,7 @@ class ProductController
                 'data' => $products
             ]);
         } catch (\Throwable $e) {
-            throw new RuntimeException('Failed to fetch products: ' . $e->getMessage());
+            Handler::handle($e);
         }
     }
 
@@ -39,15 +40,15 @@ class ProductController
             $data = json_decode(file_get_contents('php://input'), true);
 
             if (!$data) {
-                throw new RuntimeException('Invalid input data');
+                throw new ProductException('Invalid input data');
             }
-
+            
             // validate the input data
             $this->validationService->validateProductData($data);
 
             // Check if SKU exists
             if ($this->productRepository->exists($data['sku'])) {
-                throw new RuntimeException('SKU already exists');
+                throw new ProductException('SKU already exists');
             }
 
             $product = $this->productFactory->createProduct($data);
@@ -58,7 +59,7 @@ class ProductController
                 'id' => $id
             ]);
         } catch (\Throwable $e) {
-            throw new RuntimeException('Failed to create product: ' . $e->getMessage());
+            Handler::handle($e);
         }
     }
 
@@ -66,9 +67,9 @@ class ProductController
     {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
-            
+
             if (!isset($data['ids']) || !is_array($data['ids'])) {
-                throw new RuntimeException('Invalid input: ids array required');
+                throw new ProductException('Invalid input: ids array required');
             }
 
             $deletedCount = $this->productRepository->massDelete($data['ids']);
@@ -77,9 +78,8 @@ class ProductController
                 'status' => 'success',
                 'message' => "$deletedCount products deleted successfully"
             ]);
-
         } catch (\Throwable $e) {
-            throw new RuntimeException('Failed to delete products: ' . $e->getMessage());
+            Handler::handle($e);
         }
     }
 }

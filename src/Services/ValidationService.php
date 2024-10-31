@@ -35,38 +35,31 @@ class ValidationService
         }
 
         if (!in_array($data['type'], self::VALID_PRODUCT_TYPES)) {
-            throw new ProductException("Invalid product type");
+            throw new ProductException(message: "Invalid product type");
         }
     }
 
     private function validateSpecificAttributes(array $data): void
     {
-        switch ($data['type']) {
-            case 'DVD':
-                $this->validateSize($data);
-                break;
-
-            case 'Book':
-                $this->validateWeight($data);
-                break;
-
-            case 'Furniture':
-                $this->validateDimensions($data);
-                break;
-        }
+        match ($data['type']) {
+            'DVD' => $this->validateSize($data),
+            'Book' => $this->validateWeight($data),
+            'Furniture' => $this->validateDimensions($data),
+            default => throw new ProductException("Unsupported product type: {$data['type']}")
+        };
     }
 
     private function validateSize(array $data): void
     {
         if (!isset($data['size']) || !is_numeric($data['size']) || $data['size'] <= 0) {
-            throw new ProductException("Please provide size in MB");
+            throw new ProductException("Please provide size in MB (positive number)");
         }
     }
 
     private function validateWeight(array $data): void
     {
         if (!isset($data['weight']) || !is_numeric($data['weight']) || $data['weight'] <= 0) {
-            throw new ProductException("Please provide weight in KG");
+            throw new ProductException("Please provide weight in KG (positive number)");
         }
     }
 
@@ -75,7 +68,7 @@ class ValidationService
         $dimensions = ['height', 'width', 'length'];
         foreach ($dimensions as $dim) {
             if (!isset($data[$dim]) || !is_numeric($data[$dim]) || $data[$dim] <= 0) {
-                throw new ProductException("Please provide dimensions (HxWxL)");
+                throw new ProductException("Please provide dimensions (HxWxL) (positive numbers)");
             }
         }
     }

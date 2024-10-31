@@ -125,8 +125,9 @@ class Handler
      */
     private static function getStatusCode(Throwable $exception): int
     {
-        $exceptionClass = get_class($exception);
-        return self::HTTP_CODES[$exceptionClass] ?? 500;
+        $exceptionClass = get_class(object: $exception);
+        $className = basename(str_replace('\\', '/', $exceptionClass));
+        return self::HTTP_CODES[$className] ?? 500;
     }
 
     /**

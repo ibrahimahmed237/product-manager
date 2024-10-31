@@ -26,12 +26,7 @@ class Furniture extends Product
 
     public function setSpecificAttribute($dimensions): void
     {
-        if (is_array($dimensions)) {
-            list($this->height, $this->width, $this->length) = $dimensions;
-        } else {
-            // If dimensions come as string "HxWxL"
-            list($this->height, $this->width, $this->length) = explode('x', $dimensions);
-        }
+        [$this->height, $this->width, $this->length] = [$dimensions['height'], $dimensions['width'], $dimensions['length']];
     }
 
     public function getSpecificAttribute(): string
@@ -41,6 +36,10 @@ class Furniture extends Product
 
     public function getSpecificValue()
     {
-        return "{$this->height}x{$this->width}x{$this->length}";
+        return [
+            'height' => $this->height,
+            'width' => $this->width,
+            'length' => $this->length
+        ];
     }
 }

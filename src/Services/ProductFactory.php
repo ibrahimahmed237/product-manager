@@ -87,7 +87,7 @@ class ProductFactory
     public function createFromDatabase(array $data): Product
     {
         $product = $this->createProductInstance($data['type']);
-        
+
         // Set common attributes
         $product->setId((int)$data['id']);
         $product->setSku($data['sku']);

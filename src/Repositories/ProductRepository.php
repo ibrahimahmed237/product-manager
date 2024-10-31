@@ -23,33 +23,29 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function getAll(): array
     {
-        $stm = $this->db->query(
-            "
-            SELECT id, sku, name, price, type, 
-            CASE type WHEN 'DVD' THEN 'size' 
-            WHEN 'BOOK' THEN 'weight'
-            WHEN 'Furniture' THEN CONCAT(height, 'x', width, 'x', length)
-            End as specific_value
-            FROM products
-            ORDER BY id ASC;"
-        );
-        return $stm->fetchAll(PDO::FETCH_ASSOC);
+        $stm = $this->db->query("SELECT * FROM products ORDER BY id ASC;");
+        $results = $stm->fetchAll(PDO::FETCH_ASSOC);
+        
+        return array_map(function($row) {
+            return array_filter($row, function($value) {
+                return $value !== null;
+            });
+        }, $results);
     }
 
     public function findById(int $id): ?Product
     {
         $stmt = $this->db->prepare("SELECT * FROM products WHERE id = :id");
         $stmt->execute(['id' => $id]);
-        
+
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         return $data ? $this->createProductFromData($data) : null;
-
     }
     public function findBySku(string $sku): ?Product
     {
         $stmt = $this->db->prepare("SELECT * FROM products WHERE sku = :sku");
         $stmt->execute(['sku' => $sku]);
-        
+
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         return $data ? $this->createProductFromData($data) : null;
     }
@@ -58,10 +54,10 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $placeholders = str_repeat('?,', count($ids) - 1) . '?';
         $sql = "DELETE FROM products WHERE id IN ($placeholders)";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($ids);
-        
+
         return $stmt->rowCount();
     }
 
@@ -71,7 +67,7 @@ class ProductRepository implements ProductRepositoryInterface
         $stmt->execute(['sku' => $sku]);
         return (bool)$stmt->fetch(PDO::FETCH_COLUMN);
     }
-    
+
     public function save(Product $product): int
     {
         $sql = "INSERT INTO products (
@@ -83,7 +79,7 @@ class ProductRepository implements ProductRepositoryInterface
         )";
 
         $stmt = $this->db->prepare($sql);
-        
+
         $params = [
             'sku' => $product->getSku(),
             'name' => $product->getName(),
@@ -96,7 +92,7 @@ class ProductRepository implements ProductRepositoryInterface
             'length' => null
         ];
 
-        match($product->getType()) {
+        match ($product->getType()) {
             'DVD' => $params['size'] = $product->getSpecificValue(),
             'Book' => $params['weight'] = $product->getSpecificValue(),
             'Furniture' => [
@@ -109,11 +105,9 @@ class ProductRepository implements ProductRepositoryInterface
 
         $stmt->execute($params);
         return (int)$this->db->lastInsertId();
-        
     }
-    private function createProductFromData(array $data):?Product
+    private function createProductFromData(array $data): ?Product
     {
         return $this->productFactory->createFromDatabase($data);
     }
-
 }
