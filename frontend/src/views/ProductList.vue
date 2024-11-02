@@ -76,14 +76,16 @@
         error.value = ''
         
         try {
-          const response = await axios.get(`${import.meta.env.VITE_API_URL}/products`)
+          const VITE_API_URL = import.meta.env.VITE_API_URL
+          const response = await axios.get(`${VITE_API_URL}/products`)
           if (response.data.status === 'success') {
             products.value = response.data.data
           } else {
             error.value = 'Failed to fetch products'
           }
         } catch (err) {
-          error.value = err.response?.data?.message || 'Error fetching products'
+          error.value = err.response?.data?.message || 'Error fetching products';
+          console.log('VITE_API_URL:', VITE_API_URL);
           console.error('Error fetching products:', err)
         } finally {
           loading.value = false
