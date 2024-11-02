@@ -74,9 +74,9 @@
       const fetchProducts = async () => {
         loading.value = true
         error.value = ''
-        
+        const VITE_API_URL = import.meta.env.VITE_API_URL
+
         try {
-          const VITE_API_URL = import.meta.env.VITE_API_URL
           const response = await axios.get(`${VITE_API_URL}/products`)
           if (response.data.status === 'success') {
             products.value = response.data.data
