@@ -57,6 +57,7 @@
   
   <script>
   import { ref, onMounted } from 'vue'
+  import axios from 'axios'
   
   export default {
     name: 'ProductList',
@@ -76,7 +77,7 @@
         const VITE_API_URL = import.meta.env.VITE_API_URL
 
         try {
-          const response = await fetch(`${VITE_API_URL}/products`)
+          const response = await axios.get(`${VITE_API_URL}/products`)
           if (response.data.status === 'success') {
             products.value = response.data.data
           } else {
@@ -98,13 +99,9 @@
         error.value = ''
         
         try {
-          await fetch(`${import.meta.env.VITE_API_URL}/mass-delete`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ ids: selectedProducts.value })
-          });
+          await axios.delete(`${import.meta.env.VITE_API_URL}/mass-delete`, {
+            data: { ids: selectedProducts.value }
+          })
           await fetchProducts()
           selectedProducts.value = []
         } catch (err) {
