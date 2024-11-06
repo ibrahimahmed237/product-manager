@@ -397,7 +397,7 @@ export default {
         }
         router.push("/");
 
-        axios.post(`${import.meta.env.VITE_API_URL}/products`, payload);
+        await axios.post(`${import.meta.env.VITE_API_URL}/products`, payload);
       } catch (err) {
         if (err.response?.data?.message === "SKU already exists") {
           error.value = "SKU must be unique";
