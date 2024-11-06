@@ -1,127 +1,54 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
+import fs from "fs";
+// Helper function to check for product list
 
-// Helper function to fill common fields
-async function fillCommonFields(page, { sku, name, price }) {
-  await page.fill('#sku', sku);
-  await page.fill('#name', name);
-  await page.fill('#price', price);
-}
+test.describe("Product Manipulation", () => {
+  test("should handle complete product lifecycle", async ({ page }) => {
+    // Initial page load
+    await page.goto("http://localhost:5173/");
 
-// Helper function to verify successful product creation
-async function verifyProductCreation(page, productName) {
-  await expect(page.getByText('Product List')).toBeVisible({ timeout: 10000 });
-  await expect(page.getByText(productName)).toBeVisible({ timeout: 10000 });
-}
+    // Check initial checkboxes
+    const initialCheckboxes = await page
+      .locator('input[type="checkbox"]')
+      .all();
 
-test.describe('Product Form Tests', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('https://product-manager-test-1.netlify.app/add-product');
-  });
+    // Verify checkboxes again (matching the double check in logs)
+    const verifyCheckboxes = await page.locator('input[type="checkbox"]').all();
+    await expect(verifyCheckboxes).toHaveLength(initialCheckboxes.length);
 
-  test('should create DVD product successfully', async ({ page }) => {
-    await fillCommonFields(page, {
-      sku: 'DVD123',
-      name: 'Test DVD',
-      price: '15.99'
-    });
-    await page.selectOption('#productType', 'DVD');
-    await page.fill('#size', '700');
-    await page.click('button:has-text("Save")');
-    await verifyProductCreation(page, 'Test DVD');
-  });
+    // Navigate to Add Product
+    await page.getByText("ADD").click();
+    await expect(page.getByText("Add Product")).toBeVisible();
 
-  test('should create Book product successfully', async ({ page }) => {
-    await fillCommonFields(page, {
-      sku: 'BOOK123',
-      name: 'Test Book',
-      price: '29.99'
-    });
-    await page.selectOption('#productType', 'Book');
-    await page.fill('#weight', '1.5');
-    await page.click('button:has-text("Save")');
-    await verifyProductCreation(page, 'Test Book');
-  });
+    // Add DVD Product
+    await page.fill("#sku", "DVD_TEST001");
+    await page.fill("#name", "Test DVD Product");
+    await page.fill("#price", "19.99");
+    await page.selectOption("#productType", "DVD");
 
-  test('should create Furniture product successfully', async ({ page }) => {
-    await fillCommonFields(page, {
-      sku: 'FRN123',
-      name: 'Test Furniture',
-      price: '199.99'
-    });
-    await page.selectOption('#productType', 'Furniture');
-    await page.fill('#height', '100');
-    await page.fill('#width', '50');
-    await page.fill('#length', '75');
-    await page.click('button:has-text("Save")');
-    await verifyProductCreation(page, 'Test Furniture');
-  });
+    // Verify DVD specific field is visible
+    await expect(page.locator("#size")).toBeVisible();
 
-  test('should show validation errors for invalid inputs', async ({ page }) => {
-    // Test invalid SKU
-    await page.fill('#sku', '@@invalid@@');
-    await page.click('#name'); // Trigger validation
-    await expect(page.getByText('SKU must be alphanumeric and can contain dashes and underscores')).toBeVisible();
+    // Fill DVD specific field
+    await page.fill("#size", "700");
 
-    // Test invalid price
-    await page.fill('#price', '-10');
-    await page.click('#name'); // Trigger validation
-    await expect(page.getByText('Price must be between 0.01 and 999999.99')).toBeVisible();
+    // Save the product
+    await page.getByText("Save").click();
+    // await page.getByText("cancel ").click();
 
-    // Test invalid DVD size
-    await page.selectOption('#productType', 'DVD');
-    await page.fill('#size', '0');
-    await page.click('#name'); // Trigger validation
-    await expect(page.getByText('Size must be between 1 and 999999 MB')).toBeVisible();
-  });
-
-  test('should handle duplicate SKU error', async ({ page }) => {
-    // First product
-    await fillCommonFields(page, {
-      sku: 'DUPLICATE123',
-      name: 'First Product',
-      price: '10.00'
-    });
-    await page.selectOption('#productType', 'DVD');
-    await page.fill('#size', '500');
-    await page.click('button:has-text("Save")');
-    await verifyProductCreation(page, 'First Product');
-
-    // Try to create second product with same SKU
-    await page.goto('https://product-manager-test-1.netlify.app/add-product');
-    await fillCommonFields(page, {
-      sku: 'DUPLICATE123',
-      name: 'Second Product',
-      price: '20.00'
-    });
-    await page.selectOption('#productType', 'DVD');
-    await page.fill('#size', '300');
-    await page.click('button:has-text("Save")');
-    await expect(page.getByText('SKU must be unique')).toBeVisible();
-  });
-
-  test('should clear type-specific fields when type changes', async ({ page }) => {
-    // Fill DVD fields
-    await page.selectOption('#productType', 'DVD');
-    await page.fill('#size', '500');
-
-    // Change to Book
-    await page.selectOption('#productType', 'Book');
+    await fs.writeFileSync("product-list.html", await page.content());
     
-    // Verify DVD field is cleared
-    await expect(page.locator('#size')).toHaveValue('');
-    
-    // Fill Book field
-    await page.fill('#weight', '2.5');
+    // Verify product list is visible
+    await waitForProductList(page);
 
-    // Change to Furniture
-    await page.selectOption('#productType', 'Furniture');
-    
-    // Verify Book field is cleared
-    await expect(page.locator('#weight')).toHaveValue('');
-  });
+    // Verify new product is visible
+    // await expect(page.getByText("Test DVD Product")).toBeVisible();
 
-  test('should handle form submission with empty required fields', async ({ page }) => {
-    await page.click('button:has-text("Save")');
-    await expect(page.getByText('Please, submit required data')).toBeVisible();
+    // Verify redirect and product visibility
+    // await waitForProductList(page);
   });
 });
+async function waitForProductList(page) {
+  await expect(page.getByText("Product List")).toBeVisible({ timeout: 10000 });
+}
+

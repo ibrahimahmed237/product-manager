@@ -6,14 +6,12 @@
         <button
           @click="saveProduct"
           class="bg-green-500 text-white px-4 py-2 rounded"
-          :disabled="isSubmitting"
         >
           Save
         </button>
         <button
           @click="$router.push('/')"
           class="bg-gray-500 text-white px-4 py-2 rounded"
-          :disabled="isSubmitting"
         >
           Cancel
         </button>
@@ -28,62 +26,70 @@
       <span class="block sm:inline">{{ error }}</span>
     </div>
 
-    <form @submit.prevent="saveProduct" id="product_form" class="max-w-2xl mx-auto">
+    <form
+      id="product_form"
+      @submit.prevent="saveProduct"
+      class="max-w-2xl mx-auto"
+    >
       <div class="space-y-6">
-        <!-- SKU Field -->
         <div>
-          <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
+          <label for="sku" class="block text-sm font-medium text-gray-700"
+            >SKU</label
+          >
           <input
             id="sku"
-            v-model.trim="product.sku"
+            v-model="product.sku"
             type="text"
             required
             class="mt-1 block w-full rounded border-gray-300 shadow-sm"
             @input="validateField('sku')"
           />
-          <span v-if="validationErrors.sku" class="text-red-500 text-sm">
-            {{ validationErrors.sku }}
-          </span>
+          <span v-if="validationErrors.sku" class="text-red-500 text-sm">{{
+            validationErrors.sku
+          }}</span>
         </div>
 
-        <!-- Name Field -->
         <div>
-          <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+          <label for="name" class="block text-sm font-medium text-gray-700"
+            >Name</label
+          >
           <input
             id="name"
-            v-model.trim="product.name"
+            v-model="product.name"
             type="text"
             required
             class="mt-1 block w-full rounded border-gray-300 shadow-sm"
             @input="validateField('name')"
           />
-          <span v-if="validationErrors.name" class="text-red-500 text-sm">
-            {{ validationErrors.name }}
-          </span>
+          <span v-if="validationErrors.name" class="text-red-500 text-sm">{{
+            validationErrors.name
+          }}</span>
         </div>
 
-        <!-- Price Field -->
         <div>
-          <label for="price" class="block text-sm font-medium text-gray-700">Price ($)</label>
+          <label for="price" class="block text-sm font-medium text-gray-700"
+            >Price ($)</label
+          >
           <input
             id="price"
-            v-model.number="product.price"
+            v-model="product.price"
             type="number"
             step="0.01"
             required
             class="mt-1 block w-full rounded border-gray-300 shadow-sm"
             @input="validateField('price')"
           />
-          <span v-if="validationErrors.price" class="text-red-500 text-sm">
-            {{ validationErrors.price }}
-          </span>
+          <span v-if="validationErrors.price" class="text-red-500 text-sm">{{
+            validationErrors.price
+          }}</span>
         </div>
 
-        <!-- Type Switcher -->
         <div>
-          <label for="productType" class="block text-sm font-medium text-gray-700">
-            Type Switcher
-          </label>
+          <label
+            for="productType"
+            class="block text-sm font-medium text-gray-700"
+            >Type Switcher</label
+          >
           <select
             id="productType"
             v-model="product.type"
@@ -96,94 +102,112 @@
             <option value="Book">Book</option>
             <option value="Furniture">Furniture</option>
           </select>
-          <span v-if="validationErrors.type" class="text-red-500 text-sm">
-            {{ validationErrors.type }}
-          </span>
         </div>
 
-        <!-- DVD Size -->
+        <!-- Dynamic attributes based on product type -->
         <div v-if="product.type === 'DVD'" class="space-y-4">
           <p class="text-sm text-gray-600">Please, provide size in MB</p>
           <div>
-            <label for="size" class="block text-sm font-medium text-gray-700">Size (MB)</label>
+            <label for="size" class="block text-sm font-medium text-gray-700"
+              >Size (MB)</label
+            >
             <input
               id="size"
-              v-model.number="product.size"
+              v-model="product.size"
               type="number"
               required
               class="mt-1 block w-full rounded border-gray-300 shadow-sm"
               @input="validateField('size')"
             />
-            <span v-if="validationErrors.size" class="text-red-500 text-sm">
-              {{ validationErrors.size }}
-            </span>
+            <span v-if="validationErrors.size" class="text-red-500 text-sm">{{
+              validationErrors.size
+            }}</span>
           </div>
         </div>
 
-        <!-- Book Weight -->
         <div v-if="product.type === 'Book'" class="space-y-4">
           <p class="text-sm text-gray-600">Please, provide weight in KG</p>
           <div>
-            <label for="weight" class="block text-sm font-medium text-gray-700">Weight (KG)</label>
+            <label for="weight" class="block text-sm font-medium text-gray-700"
+              >Weight (KG)</label
+            >
             <input
               id="weight"
-              v-model.number="product.weight"
+              v-model="product.weight"
               type="number"
               step="0.01"
               required
               class="mt-1 block w-full rounded border-gray-300 shadow-sm"
               @input="validateField('weight')"
             />
-            <span v-if="validationErrors.weight" class="text-red-500 text-sm">
-              {{ validationErrors.weight }}
-            </span>
+            <span v-if="validationErrors.weight" class="text-red-500 text-sm">{{
+              validationErrors.weight
+            }}</span>
           </div>
         </div>
 
-        <!-- Furniture Dimensions -->
         <div v-if="product.type === 'Furniture'" class="space-y-4">
           <p class="text-sm text-gray-600">Please, provide dimensions</p>
           <div class="grid grid-cols-3 gap-4">
             <div>
-              <label for="height" class="block text-sm font-medium text-gray-700">Height (CM)</label>
+              <label
+                for="height"
+                class="block text-sm font-medium text-gray-700"
+                >Height (CM)</label
+              >
               <input
                 id="height"
-                v-model.number="product.dimensions.height"
+                v-model="product.dimensions.height"
                 type="number"
                 required
                 class="mt-1 block w-full rounded border-gray-300 shadow-sm"
                 @input="validateField('dimensions.height')"
               />
-              <span v-if="validationErrors['dimensions.height']" class="text-red-500 text-sm">
-                {{ validationErrors['dimensions.height'] }}
+              <span
+                v-if="validationErrors['dimensions.height']"
+                class="text-red-500 text-sm"
+              >
+                {{ validationErrors["dimensions.height"] }}
               </span>
             </div>
             <div>
-              <label for="width" class="block text-sm font-medium text-gray-700">Width (CM)</label>
+              <label for="width" class="block text-sm font-medium text-gray-700"
+                >Width (CM)</label
+              >
               <input
                 id="width"
-                v-model.number="product.dimensions.width"
+                v-model="product.dimensions.width"
                 type="number"
                 required
                 class="mt-1 block w-full rounded border-gray-300 shadow-sm"
                 @input="validateField('dimensions.width')"
               />
-              <span v-if="validationErrors['dimensions.width']" class="text-red-500 text-sm">
-                {{ validationErrors['dimensions.width'] }}
+              <span
+                v-if="validationErrors['dimensions.width']"
+                class="text-red-500 text-sm"
+              >
+                {{ validationErrors["dimensions.width"] }}
               </span>
             </div>
             <div>
-              <label for="length" class="block text-sm font-medium text-gray-700">Length (CM)</label>
+              <label
+                for="length"
+                class="block text-sm font-medium text-gray-700"
+                >Length (CM)</label
+              >
               <input
                 id="length"
-                v-model.number="product.dimensions.length"
+                v-model="product.dimensions.length"
                 type="number"
                 required
                 class="mt-1 block w-full rounded border-gray-300 shadow-sm"
                 @input="validateField('dimensions.length')"
               />
-              <span v-if="validationErrors['dimensions.length']" class="text-red-500 text-sm">
-                {{ validationErrors['dimensions.length'] }}
+              <span
+                v-if="validationErrors['dimensions.length']"
+                class="text-red-500 text-sm"
+              >
+                {{ validationErrors["dimensions.length"] }}
               </span>
             </div>
           </div>
@@ -194,92 +218,88 @@
 </template>
 
 <script>
-import { ref, reactive } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { ref, reactive } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
 
 export default {
-  name: 'AddProduct',
+  name: "AddProduct",
   setup() {
     const router = useRouter();
-    const error = ref('');
-    const isSubmitting = ref(false);
+    const error = ref("");
     const validationErrors = reactive({});
 
     const product = reactive({
-      sku: '',
-      name: '',
-      price: '',
-      type: '',
-      size: '',
-      weight: '',
+      sku: "",
+      name: "",
+      price: "",
+      type: "",
+      size: "",
+      weight: "",
       dimensions: {
-        height: '',
-        width: '',
-        length: '',
+        height: "",
+        width: "",
+        length: "",
       },
     });
 
+    // Validation rules
     const validationRules = {
       sku: {
         required: true,
         maxLength: 64,
         pattern: /^[A-Za-z0-9-_]+$/,
-        message: 'SKU must be alphanumeric and can contain dashes and underscores',
+        message:
+          "SKU must be alphanumeric and can contain dashes and underscores",
       },
       name: {
         required: true,
         maxLength: 255,
         pattern: /^[A-Za-z0-9\s-_]+$/,
-        message: 'Name must contain only letters, numbers, spaces, dashes and underscores',
+        message:
+          "Name must contain only letters, numbers, spaces, dashes and underscores",
       },
       price: {
         required: true,
         min: 0.01,
         max: 999999.99,
-        message: 'Price must be between 0.01 and 999999.99',
+        message: "Price must be between 0.01 and 999999.99",
       },
       size: {
         min: 1,
         max: 999999,
-        message: 'Size must be between 1 and 999999 MB',
+        message: "Size must be between 1 and 999999 MB",
       },
       weight: {
         min: 0.01,
         max: 999.99,
-        message: 'Weight must be between 0.01 and 999.99 KG',
+        message: "Weight must be between 0.01 and 999.99 KG",
       },
-      'dimensions.height': {
+      dimensions: {
         min: 1,
         max: 999,
-        message: 'Height must be between 1 and 999 CM',
-      },
-      'dimensions.width': {
-        min: 1,
-        max: 999,
-        message: 'Width must be between 1 and 999 CM',
-      },
-      'dimensions.length': {
-        min: 1,
-        max: 999,
-        message: 'Length must be between 1 and 999 CM',
+        message: "Dimensions must be between 1 and 999 CM",
       },
     };
 
     const validateField = (fieldName) => {
-      const rules = validationRules[fieldName];
+      const rules = validationRules[fieldName.split(".")[0]];
       if (!rules) return true;
 
-      let value = fieldName.includes('.')
-        ? product.dimensions[fieldName.split('.')[1]]
+      let value = fieldName.includes(".")
+        ? product.dimensions[fieldName.split(".")[1]]
         : product[fieldName];
 
       // Clear previous error
-      delete validationErrors[fieldName];
+      if (fieldName.includes(".")) {
+        delete validationErrors[fieldName];
+      } else {
+        delete validationErrors[fieldName];
+      }
 
       // Required check
-      if (rules.required && !value && value !== 0) {
-        validationErrors[fieldName] = 'This field is required';
+      if (rules.required && !value) {
+        validationErrors[fieldName] = "This field is required";
         return false;
       }
 
@@ -291,7 +311,9 @@ export default {
 
       // Length check for text fields
       if (rules.maxLength && value.length > rules.maxLength) {
-        validationErrors[fieldName] = `Maximum length is ${rules.maxLength} characters`;
+        validationErrors[
+          fieldName
+        ] = `Maximum length is ${rules.maxLength} characters`;
         return false;
       }
 
@@ -309,98 +331,79 @@ export default {
 
     const handleTypeChange = () => {
       // Reset type-specific fields when type changes
-      product.size = '';
-      product.weight = '';
-      product.dimensions.height = '';
-      product.dimensions.width = '';
-      product.dimensions.length = '';
+      product.size = "";
+      product.weight = "";
+      product.dimensions.height = "";
+      product.dimensions.width = "";
+      product.dimensions.length = "";
 
       // Clear related validation errors
       delete validationErrors.size;
       delete validationErrors.weight;
-      delete validationErrors['dimensions.height'];
-      delete validationErrors['dimensions.width'];
-      delete validationErrors['dimensions.length'];
+      delete validationErrors["dimensions.height"];
+      delete validationErrors["dimensions.width"];
+      delete validationErrors["dimensions.length"];
     };
 
     const validateForm = () => {
       let isValid = true;
 
       // Validate common fields
-      ['sku', 'name', 'price'].forEach((field) => {
+      ["sku", "name", "price"].forEach((field) => {
         if (!validateField(field)) {
           isValid = false;
         }
       });
 
-      // Check product type is selected
-      if (!product.type) {
-        validationErrors.type = 'Product type is required';
-        isValid = false;
+      // Validate type-specific fields
+      if (product.type === "DVD") {
+        if (!validateField("size")) isValid = false;
+      } else if (product.type === "Book") {
+        if (!validateField("weight")) isValid = false;
+      } else if (product.type === "Furniture") {
+        ["height", "width", "length"].forEach((dim) => {
+          if (!validateField(`dimensions.${dim}`)) isValid = false;
+        });
       }
 
-      // Validate type-specific fields
-      switch (product.type) {
-        case 'DVD':
-          if (!validateField('size')) isValid = false;
-          break;
-        case 'Book':
-          if (!validateField('weight')) isValid = false;
-          break;
-        case 'Furniture':
-          ['height', 'width', 'length'].forEach((dim) => {
-            if (!validateField(`dimensions.${dim}`)) isValid = false;
-          });
-          break;
+      if (!product.type) {
+        validationErrors.type = "Product type is required";
+        isValid = false;
       }
 
       return isValid;
     };
 
     const saveProduct = async () => {
-      error.value = '';
-      
+      error.value = "";
+
       if (!validateForm()) {
-        error.value = 'Please, submit required data';
+        error.value = "Please, submit required data";
         return;
       }
 
       try {
-        isSubmitting.value = true;
-        
-        // Prepare payload
-        const payload = {
-          sku: product.sku,
-          name: product.name,
-          price: product.price,
-          type: product.type,
-        };
+        // Prepare the data payload
+        const payload = { ...product };
 
-        // Add type-specific attributes
-        switch (product.type) {
-          case 'DVD':
-            payload.size = product.size;
-            break;
-          case 'Book':
-            payload.weight = product.weight;
-            break;
-          case 'Furniture':
-            payload.height = product.dimensions.height;
-            payload.width = product.dimensions.width;
-            payload.length = product.dimensions.length;
-            break;
+        // If product type is "Furniture", include dimensions separately
+        if (product.type === "Furniture") {
+          payload.height = product.dimensions.height;
+          payload.width = product.dimensions.width;
+          payload.length = product.dimensions.length;
+
+          // Remove the dimensions object as we now have the separate properties
+          delete payload.dimensions;
         }
+        router.push("/");
 
-        await axios.post(`${import.meta.env.VITE_API_URL}/products`, payload);
-        router.push('/');
+        axios.post(`${import.meta.env.VITE_API_URL}/products`, payload);
       } catch (err) {
-        if (err.response?.data?.message === 'SKU already exists') {
-          error.value = 'SKU must be unique';
+        if (err.response?.data?.message === "SKU already exists") {
+          error.value = "SKU must be unique";
         } else {
-          error.value = 'Please, provide the data of indicated type';
+          error.value = "Please, provide the data of indicated type";
         }
-      } finally {
-        isSubmitting.value = false;
       }
     };
 
@@ -408,7 +411,6 @@ export default {
       product,
       error,
       validationErrors,
-      isSubmitting,
       saveProduct,
       validateField,
       handleTypeChange,
