@@ -395,9 +395,14 @@ export default {
           // Remove the dimensions object as we now have the separate properties
           delete payload.dimensions;
         }
+        await fetch(`${import.meta.env.VITE_API_URL}/products`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
         router.push("/");
-
-        await axios.post(`${import.meta.env.VITE_API_URL}/products`, payload);
       } catch (err) {
         if (err.response?.data?.message === "SKU already exists") {
           error.value = "SKU must be unique";
