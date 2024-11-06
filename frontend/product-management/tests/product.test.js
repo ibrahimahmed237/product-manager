@@ -4,7 +4,7 @@ import fs from "fs";
 
 test.describe("Product manipulation", () => {
   test("Remove and add different products", async ({ page }) => {
-    await page.goto("http://localhost:5173/", {
+    await page.goto("https://product-manager-1slz.vercel.app/", {
       timeout: 3000,
     });
 
@@ -87,7 +87,7 @@ test.describe("Product manipulation", () => {
   });
 
   test("add product with invalid input", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
+    await page.goto("https://product-manager-1slz.vercel.app/");
 
     await page.getByText("ADD").click();
 
